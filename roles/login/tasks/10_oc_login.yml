@@ -1,0 +1,64 @@
+---
+# tasks file for initialize
+
+- name: check if oc logged in
+  ansible.builtin.command: oc get nodes
+  register: oc_status
+  ignore_errors: yes
+  changed_when: false
+
+#- name: display oc status
+#  debug:
+#    msg: "status register: {{ oc_status }}"
+
+- name: login
+  command: oc login https://192.168.42.210:6443 -u {{ oc_user }} -p {{ oc_password }}
+  register: login
+  when: oc_status.rc != 0
+
+- name: verify login
+  command: oc get nodes
+  register: oc_status
+  changed_when: false
+  when: oc_status.rc != 0
+
+#- name: status output
+#  debug:
+#    var: oc_status
+
+#- name: logout on controller for testing
+#  command: oc logout
+#  when: '"controller" in group_names'
+
+
+
+
+
+
+- name: Display all variables/facts known for a host
+  vars:
+    msg: |
+      Module Variables ("vars"):
+      --------------------------------
+       vars | to_nice_json
+
+      Environment Variables ("environment"):
+      --------------------------------
+      {{ environment | to_nice_json }}
+
+      GROUP NAMES Variables ("group_names"):
+      --------------------------------
+      {{ group_names | to_nice_json }}
+
+      GROUPS Variables ("groups"):
+      --------------------------------
+      {{ groups | to_nice_json }}
+
+      HOST Variables ("hostvars"):
+      --------------------------------
+      {{ hostvars | to_nice_json }}
+
+  debug:
+    msg: "{{ msg.split('\n') }}"
+#    var: hostvars[inventory_hostname]
+  tags: never

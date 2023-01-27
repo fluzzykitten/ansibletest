@@ -1,0 +1,60 @@
+---
+
+- name: packages
+  become: yes
+  ansible.builtin.package:
+    name: nfs-utils
+    state: present
+
+- name: startup enable
+  become: yes
+  ansible.builtin.systemd:
+    name: nfs-utils
+    state: started
+    enabled: yes
+
+- name: make nfs registry
+  become: yes
+  ansible.builtin.file:
+    state: directory
+    path: "/var/nfsshare/registry"
+
+- name: permissions on nfs reg
+  become: yes
+  ansible.builtin.file:
+    state: directory
+    path: "/var/nfsshare"
+    mode: "0777"
+    owner: nobody
+    group: nobody
+
+- name: nfsshare exports
+  become: yes
+  ansible.builtin.lineinfile:
+    path: /etc/exports
+    line: '/var/nfsshare 192.168.42.0/24(rw,sync,no_root_squash,no_all_squash,no_wdelay)'
+    create: yes
+
+- name: setsebool
+  become: yes
+  command: setsebool -P nfs_export_all_rw 1
+
+- name: restart nfs
+  become: yes
+  ansible.builtin.systemd:
+    name: nfs-utils
+    state: restarted
+
+- name: FirewallD rules
+  become: yes
+  firewalld:
+    permanent: yes
+    immediate: yes
+    service: "{{ item }}"
+    state: enabled
+    zone: public
+  with_items:
+    - mountd
+    - rpc-bind
+    - nfs
+

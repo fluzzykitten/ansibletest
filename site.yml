@@ -1,0 +1,22 @@
+---
+
+- name: ssh-copy-id
+  hosts: none #controller
+  gather_facts: no
+  tasks:
+    - include_tasks: ssh.yml
+
+
+- name: approve csr
+  hosts: okd4
+  tasks:
+    - name: approve stuff
+      ansible.builtin.include_tasks: oc_csr.yml
+
+- name: initialize
+  hosts: okd4 #dev
+  roles:
+    - initialize
+  tags:
+    - initialize
+

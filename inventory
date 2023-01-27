@@ -1,0 +1,14 @@
+[controller]
+192.168.42.19  ansible_connection=local  ansible_user=john
+
+[okd4]
+192.168.42.210  ansible_connection=ssh  ansible_user=john
+
+[dipController]
+192.168.42.21  ansible_connection=ssh  ansible_user=root
+
+[dev:children]
+controller
+okd4
+
+[prod:children]

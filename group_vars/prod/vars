@@ -1,0 +1,2 @@
+all_var_oc_user: "{{ vault_oc_user }}"
+all_var_oc_password: "{{ vault_oc_password }}"

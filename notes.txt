@@ -1,0 +1,14 @@
+ansible-galaxy init test-role
+
+ansible-config view #view config file
+ansible-config list #print all config options
+
+ansible-inventory --list
+
+ansible dipController -m ansible.builtin.setup --list-hosts
+ansible all -m ansible.builtin.setup --tree /tmp/facts #gather facts
+
+ansible-playbook site.yml --list-tasks
+ansible-playbook site.yml --tags initialize
+
+ansible-galaxy collection list

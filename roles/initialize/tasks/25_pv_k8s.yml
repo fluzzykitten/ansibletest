@@ -1,0 +1,49 @@
+- name: make folder to hold templates
+  become: yes
+  ansible.builtin.file:
+    state: directory
+    path: "/home/john/okd4_files_ansible"
+    owner: john
+    group: john
+
+- name: copy registry-pv
+  vars:
+    nfs_server: 192.168.42.210
+  ansible.builtin.template:
+    src: registry_pv.yaml
+    dest: /home/john/okd4_files_ansible
+
+- name: install kubernetes from pip
+  become: yes
+  ansible.builtin.pip:
+    name: kubernetes
+
+- name: apply pvc
+  vars:
+    nfs_server: 192.168.42.210
+  kubernetes.core.k8s:
+    template: registry_pv.yaml
+
+#- name: patch image registry
+#  kubernetes.core.k8s:
+#    state: patched
+#    kind: config.imageregistry.operator.openshift.io
+#    name: cluster
+#    definition:
+#      metadata:
+#        labels:
+#          support: patch
+#      spec:
+#        managementState: Managed
+#        storage:
+#          pvc:
+#            claim:
+
+- name: get pods
+  kubernetes.core.k8s_info:
+    kind: clusteroperators
+  register: pod_reg
+
+- name: debug pods
+  debug:
+    var: pod_reg

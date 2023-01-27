@@ -1,0 +1,17 @@
+---
+
+- name: get csr
+  shell: |
+    oc get csr
+    oc get csr -o go-template='{{ '{{' }}range .items{{ '}}' }}{{ '{{' }}if not .status{{ '}}' }}{{ '{{' }}.metadata.name{{ '}}' }}{{ '{{' }}"\n"{{ '}}' }}{{ '{{' }}end{{ '}}' }}{{ '{{' }}end{{ '}}' }}' | xargs oc adm certificate approve 2>/dev/null || echo "none to approve"
+#    oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs oc adm certificate approve
+  register: csr
+  until: "'Pending' not in csr.stdout"
+  retries: 6
+  delay: 5
+  changed_when: csr.attempts > 1
+
+- name: disp csr
+  debug:
+    msg: "{{ csr.stdout.split('\n') | list }}"
+

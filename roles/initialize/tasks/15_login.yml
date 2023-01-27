@@ -1,0 +1,10 @@
+---
+
+- name: get admin password
+  command: cat /home/john/install_dir/auth/kubeadmin-password
+  register: kubeadmin_password
+  changed_when: false
+
+- name: disp admin password
+  debug:
+    msg: "kubeadmin-password: {{ kubeadmin_password.stdout }}"
